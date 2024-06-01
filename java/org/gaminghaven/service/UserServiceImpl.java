@@ -1,20 +1,37 @@
 package org.gaminghaven.service;
+
+import org.apache.coyote.Request;
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.Order;
 import org.gaminghaven.entities.Product;
 import org.gaminghaven.entities.Trade;
 import org.gaminghaven.entities.User;
+import org.gaminghaven.exceptions.InvalidLoginCreds;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.repos.OrderRepo;
 import org.gaminghaven.repos.ProductRepo;
 import org.gaminghaven.repos.UserRepo;
+import org.gaminghaven.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
+import org.springframework.security.web.context.HttpRequestResponseHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;

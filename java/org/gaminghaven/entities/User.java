@@ -18,7 +18,6 @@ public class User {
     private String email;
 
     @Column(length = 500, name = "password_hash")
-    @JsonIgnore
     private String password;
 
     @Column(nullable = false, unique = true, length = 100)
