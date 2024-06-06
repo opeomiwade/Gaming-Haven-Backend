@@ -5,7 +5,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,12 +19,6 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String productName;
 
-    @Column
-    private String description;
-
-    @Column(nullable = false)
-    private BigDecimal price;
-
     @Column(name = "product_type", nullable = false)
     private String productType;
 
@@ -37,46 +30,37 @@ public class Product {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Category category;
 
-    @Column
-    private String condition;
-
-    @Column(name = "sold_by_us", nullable = false)
-    private Boolean soldByUs;
-
-    @Column(nullable = false, name = "created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, name = "updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // list of orders containing the product.
-    @ManyToMany(mappedBy = "products")
+    @OneToMany(mappedBy = "listedProduct")
     @JsonIgnore
-    private List<Order> orders;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    @JsonIgnore
-    private List<ProductImage> images;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    @JsonIgnore
-    private List<Review> reviews;
+    private List<Listing> productListings;
 
     // list of users selling this product
-    @ManyToMany(mappedBy = "userListedProducts")
+    @ManyToMany(mappedBy = "products")
     @JsonIgnore
     private List<User> sellers;
 
-    public List<Review> getReviews() {
-        return reviews;
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 
     public List<User> getSellers() {
         return sellers;
     }
 
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
+    public List<Listing> getProductListings() {
+        return productListings;
+    }
+
+    public void setProductListings(List<Listing> productListings) {
+        this.productListings = productListings;
     }
 
     public void setSellers(List<User> sellers) {
@@ -85,14 +69,6 @@ public class Product {
 
     public int getProductId() {
         return productId;
-    }
-
-    public List<ProductImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<ProductImage> images) {
-        this.images = images;
     }
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
@@ -111,20 +87,12 @@ public class Product {
         this.productName = productName;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
     public void setProductType(String productType) {
         this.productType = productType;
     }
 
     public String getProductType() {
         return productType;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public Category getCategory() {
@@ -135,28 +103,8 @@ public class Product {
         return createdAt;
     }
 
-    public Boolean getSoldByUs() {
-        return soldByUs;
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public String getManufacturer() {
@@ -167,19 +115,8 @@ public class Product {
         this.category = category;
     }
 
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
     }
 
-    public void setSoldByUs(Boolean soldByUs) {
-        this.soldByUs = soldByUs;
-    }
 }

@@ -1,6 +1,8 @@
 package org.gaminghaven.entities;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "trades")
@@ -19,23 +21,39 @@ public class Trade {
     private User user2;
 
     @ManyToOne
-    @JoinColumn(name = "product_id_1", nullable = false)
-    private Product product1;
+    @JoinColumn(name = "listing_id_1", nullable = false)
+    private Listing listing1;
 
     @ManyToOne
-    @JoinColumn(name = "product_id_2", nullable = false)
-    private Product product2;
+    @JoinColumn(name = "listing_id_2", nullable = false)
+    private Listing listing2;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     public int getId() {
         return id;
     }
 
-    public Product getProduct1() {
-        return product1;
+    public Listing getListing1() {
+        return listing1;
     }
 
-    public Product getProduct2() {
-        return product2;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public Listing getListing2() {
+        return listing2;
     }
 
     public User getUser1() {
@@ -46,16 +64,16 @@ public class Trade {
         return user2;
     }
 
-    public void setProduct1(Product product1) {
-        this.product1 = product1;
+    public void setListing1(Listing listing1) {
+        this.listing1 = listing1;
     }
 
     public void setUser1(User user1) {
         this.user1 = user1;
     }
 
-    public void setProduct2(Product product2) {
-        this.product2 = product2;
+    public void setListing2(Listing listing2) {
+        this.listing2 = listing2;
     }
 
     public void setUser2(User user2) {

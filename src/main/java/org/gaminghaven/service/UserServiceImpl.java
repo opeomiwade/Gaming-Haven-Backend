@@ -1,12 +1,10 @@
 package org.gaminghaven.service;
 import org.gaminghaven.config.JwtService;
-import org.gaminghaven.entities.Order;
-import org.gaminghaven.entities.Product;
-import org.gaminghaven.entities.Trade;
-import org.gaminghaven.entities.User;
+import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.repos.OrderRepo;
 import org.gaminghaven.repos.ProductRepo;
+import org.gaminghaven.repos.TradeRepo;
 import org.gaminghaven.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,7 +40,7 @@ public class UserServiceImpl implements UserService {
     private OrderRepo orderRepo;
 
     @Autowired
-    private OrderRepo tradeRepo;
+    private TradeRepo tradeRepo;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -113,8 +111,8 @@ public class UserServiceImpl implements UserService {
         BigDecimal totalSales = orderRepo.calculateTotalSales();
         List<Trade> receivedTrades = user.getReceivedTrades();
         List<Trade> sentTrades = user.getInitiatedTrades();
-        List<Product> savedItems = user.getSavedItems();
-        List<Product> userListedProducts = user.getUserListedProducts();
+        List<Listing> savedListings = user.getSavedListings();
+        List<Listing> userListedProducts = user.getUserListings();
         List<Order> placedOrders = user.getPlacedOrders();
         List<Order> receivedOrders = user.getReceivedOrders();
         dashboardInfo.put("totalExpenses", totalExpenses);
@@ -123,7 +121,7 @@ public class UserServiceImpl implements UserService {
         dashboardInfo.put("totalSales", totalSales);
         dashboardInfo.put("receivedTrades", receivedTrades);
         dashboardInfo.put("sentTrades", sentTrades);
-        dashboardInfo.put("savedItems", savedItems);
+        dashboardInfo.put("savedListings", savedListings);
         dashboardInfo.put("listedProducts", userListedProducts);
         dashboardInfo.put("placedOrders", placedOrders);
         dashboardInfo.put("receivedOrders", receivedOrders);

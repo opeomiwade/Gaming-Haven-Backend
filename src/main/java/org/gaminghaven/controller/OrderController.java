@@ -28,7 +28,7 @@ public class OrderController {
         try {
             return new ResponseEntity(service.getOrderById(id), HttpStatus.OK);
         } catch (OrderNotFoundException exception) {
-            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity(exception.getMessage(), HttpStatus.OK);
         }
     }
 }

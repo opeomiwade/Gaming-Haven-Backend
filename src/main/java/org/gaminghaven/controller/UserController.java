@@ -1,6 +1,6 @@
 package org.gaminghaven.controller;
 
-import org.gaminghaven.entities.LoginRequest;
+import org.gaminghaven.requestobjects.LoginRequest;
 import org.gaminghaven.entities.Trade;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.entities.User;
@@ -42,7 +42,6 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody LoginRequest loginRequest, HttpServletResponse response, HttpServletRequest request) {
-        System.out.println(request.getSession().getId());
         try {
             return new ResponseEntity(service.loginUser(loginRequest.getEmail(), loginRequest.getPassword(), response, request), HttpStatus.OK);
         } catch (AuthenticationException exception) {
@@ -98,8 +97,8 @@ public class UserController {
         return new ResponseEntity(trades, HttpStatus.OK);
     }
 
-    @GetMapping("/saved-items")
-    public ResponseEntity getSavedItems() {
+    @GetMapping("/saved-listings")
+    public ResponseEntity getSavedListings() {
         User user;
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
@@ -107,7 +106,7 @@ public class UserController {
         } catch (UserNotFound exception) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(user.getSavedItems(), HttpStatus.OK);
+        return new ResponseEntity(user.getSavedListings(), HttpStatus.OK);
     }
 
     @GetMapping("/logout")
@@ -116,8 +115,8 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/user-store-items")
-    public ResponseEntity getUserStoreItems() {
+    @GetMapping("/user-listings")
+    public ResponseEntity getUserListedProducts() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user;
         try {
@@ -125,6 +124,6 @@ public class UserController {
         } catch (UserNotFound exception) {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity(user.getUserListedProducts(), HttpStatus.OK);
+        return new ResponseEntity(user.getUserListings(), HttpStatus.OK);
     }
 }

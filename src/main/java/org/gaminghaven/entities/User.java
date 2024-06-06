@@ -24,25 +24,28 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
-    @Column(nullable = false, name = "created_at")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, name = "updated_at")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Column(name = "image_url")
     private String imageUrl;
 
     @Column(nullable = false)
-    private  String role;
+    private String role;
 
-    //list of products sold by a user
-    @ManyToMany
-    @JoinTable(name = "user_products",
-            joinColumns = {@JoinColumn(name = "seller_id")},
-            inverseJoinColumns = {@JoinColumn(name="product_id")})
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+    }
+
+    //list of user listings
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Product> userListedProducts;
+    private List<Listing> userListings;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonIgnore
@@ -58,11 +61,11 @@ public class User {
 
     // list of products that have been saved by a user.
     @ManyToMany
-    @JoinTable(name = "saved_items",
+    @JoinTable(name = "saved_listings",
             joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
+            inverseJoinColumns = {@JoinColumn(name = "listing_id")})
     @JsonIgnore
-    private List<Product> savedItems;
+    private List<Listing> savedListings;
 
     @OneToMany(mappedBy = "buyer", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -72,12 +75,20 @@ public class User {
     @JsonIgnore
     private List<Order> receivedOrders;
 
-    public List<Product> getSavedItems() {
-        return savedItems;
+    //list of products sold by a user
+    @ManyToMany
+    @JoinTable(name = "user_products",
+            joinColumns = {@JoinColumn(name = "seller_id")},
+            inverseJoinColumns = {@JoinColumn(name = "product_id")})
+    @JsonIgnore
+    private List<Product> products;
+
+    public List<Listing> getSavedListings() {
+        return savedListings;
     }
 
-    public void setSavedItems(List<Product> savedItems) {
-        this.savedItems = savedItems;
+    public void setSavedListings(List<Listing> savedListings) {
+        this.savedListings = savedListings;
     }
 
     public void setReceivedTrades(List<Trade> receivedTrades) {
@@ -96,6 +107,18 @@ public class User {
         return initiatedTrades;
     }
 
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+    public void setUserListings(List<Listing> userListings) {
+        this.userListings = userListings;
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -104,12 +127,12 @@ public class User {
         return reviews;
     }
 
-    public List<Product> getUserListedProducts() {
-        return userListedProducts;
+    public List<Listing> getUserListings() {
+        return userListings;
     }
 
-    public void setUserListedProducts(List<Product> userListedProducts) {
-        this.userListedProducts = userListedProducts;
+    public void setUserListedProducts(List<Listing> userListinggs) {
+        this.userListings = userListinggs;
     }
 
     public void setReviews(List<Review> reviews) {
@@ -188,15 +211,4 @@ public class User {
         this.role = role;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "userId=" + userId +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", username='" + username + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

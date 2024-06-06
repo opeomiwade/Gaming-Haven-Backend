@@ -1,4 +1,4 @@
-package org.gaminghaven.entities;
+package org.gaminghaven.requestobjects;
 
 public class LoginRequest {
     private String email;

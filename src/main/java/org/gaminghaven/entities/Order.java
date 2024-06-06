@@ -1,6 +1,5 @@
 package org.gaminghaven.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,24 +18,28 @@ public class Order {
     private User buyer;
 
     @ManyToOne
-    @JoinColumn(name="seller_id", nullable = false)
+    @JoinColumn(name = "seller_id", nullable = false)
     private User seller;
 
-    @Column(name = "order_date", nullable = false)
+    @Column(name = "order_date")
     private LocalDateTime orderDate;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @PrePersist
+    protected void onCreate() {
+        orderDate = LocalDateTime.now();
+    }
+
     @ManyToMany
-    @JoinTable(name = "order_products",
+    @JoinTable(name = "order_listings",
             joinColumns = {@JoinColumn(name = "order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
-    private List<Product> products;
+            inverseJoinColumns = {@JoinColumn(name = "listing_id")})
+    private List<Listing> listing;
 
-
-    public List<Product> getProducts() {
-        return products;
+    public List<Listing> getListing() {
+        return listing;
     }
 
     public void setOrderDate(LocalDateTime orderDate) {
@@ -47,8 +50,8 @@ public class Order {
         return orderDate;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setListing(List<Listing> listing) {
+        this.listing = listing;
     }
 
     public int getOrderId() {
