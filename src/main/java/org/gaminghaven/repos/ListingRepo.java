@@ -1,6 +1,7 @@
 package org.gaminghaven.repos;
 
 import org.gaminghaven.entities.Product;
+import org.gaminghaven.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,6 @@ import java.util.List;
 public interface ListingRepo extends JpaRepository<Listing, Integer> {
     @Query("SELECT l FROM Listing l where LOWER(l.listedProduct.category.name) = :name")
     List<Listing> findByCategoryName(@Param("name") String categoryName);
+
+    List<Listing> findBySeller(User seller);
 }

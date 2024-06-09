@@ -39,7 +39,8 @@ public class SecurityConfig {
                         .antMatchers("/users/login").permitAll()             // Allow access without authentication
                         .antMatchers("/users/user/{email}").permitAll()      // Allow access without authentication
                         .antMatchers("/users/**").authenticated()        // Require authentication for all other /users/** routes
-                        .antMatchers("/listings/**").authenticated() // Require authentication for the lsitings route
+                        .antMatchers("/listings/add").authenticated() // Require authentication for the lsitings route
+                        .antMatchers("/listings/delete").authenticated() // Require authentication for the lsitings route
                         .anyRequest().permitAll()
                 ).
                 csrf().disable().
