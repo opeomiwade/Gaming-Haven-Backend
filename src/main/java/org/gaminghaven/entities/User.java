@@ -59,6 +59,14 @@ public class User {
     @JsonIgnore
     private List<Trade> receivedTrades;
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Offer> sentOffers;
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Offer> receivedOffers;
+
     // list of products that have been saved by a user.
     @ManyToMany
     @JoinTable(name = "saved_listings",
@@ -109,6 +117,23 @@ public class User {
 
     public List<Product> getProducts() {
         return products;
+    }
+
+    public List<Offer> getReceivedOffers() {
+        return receivedOffers;
+    }
+
+    public List<Offer> getSentOffers() {
+        return sentOffers;
+    }
+
+    public void setReceivedOffers(List<Offer> receivedOffers) {
+        this.receivedOffers = receivedOffers;
+    }
+
+    public void setSentOffers(List<Offer> sentOffers) {
+        this.sentOffers = sentOffers;
+
     }
 
     public void setProducts(List<Product> products) {

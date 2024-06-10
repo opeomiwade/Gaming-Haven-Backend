@@ -1,5 +1,6 @@
 package org.gaminghaven.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -24,6 +25,11 @@ public class Listing {
     //images for this listing
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL)
     private List<ListingImage> images;
+
+    // list of cash offer for this listing
+    @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Offer> offers;
 
     @Column
     private String description;
@@ -56,6 +62,14 @@ public class Listing {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<Offer> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<Offer> offers) {
+        this.offers = offers;
     }
 
     public List<ListingImage> getImages() {

@@ -31,8 +31,12 @@ public class Trade {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "trade_status")
+    private String tradeStatus;
+
     @PrePersist
     protected void onCreate() {
+        tradeStatus = "pending";
         createdAt = LocalDateTime.now();
     }
 

@@ -1,4 +1,5 @@
 package org.gaminghaven.service;
+
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.UserNotFound;
@@ -13,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
@@ -115,6 +117,8 @@ public class UserServiceImpl implements UserService {
         List<Listing> userListedProducts = user.getUserListings();
         List<Order> placedOrders = user.getPlacedOrders();
         List<Order> receivedOrders = user.getReceivedOrders();
+        List<Offer> sentOffers = user.getSentOffers();
+        List<Offer> receivedOffers = user.getReceivedOffers();
         dashboardInfo.put("totalExpenses", totalExpenses);
         dashboardInfo.put("totalIncome", totalIncome);
         dashboardInfo.put("netIncome", netIncome);
@@ -125,6 +129,8 @@ public class UserServiceImpl implements UserService {
         dashboardInfo.put("listedProducts", userListedProducts);
         dashboardInfo.put("placedOrders", placedOrders);
         dashboardInfo.put("receivedOrders", receivedOrders);
+        dashboardInfo.put("sentOffers", sentOffers);
+        dashboardInfo.put("receivedOffers", receivedOffers);
         return dashboardInfo;
     }
 
