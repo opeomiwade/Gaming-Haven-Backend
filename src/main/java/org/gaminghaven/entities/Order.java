@@ -1,7 +1,10 @@
 package org.gaminghaven.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,41 +20,35 @@ public class Order {
     @JoinColumn(name = "buyer_id", nullable = false)
     private User buyer;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    private User seller;
-
     @Column(name = "order_date")
     private LocalDateTime orderDate;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @OneToMany(mappedBy = "order")
+    @JsonIgnore
+    private List<Listing> orderItems;
+
     @PrePersist
     protected void onCreate() {
         orderDate = LocalDateTime.now();
-    }
-
-    @ManyToMany
-    @JoinTable(name = "order_listings",
-            joinColumns = {@JoinColumn(name = "order_id")},
-            inverseJoinColumns = {@JoinColumn(name = "listing_id")})
-    private List<Listing> listing;
-
-    public List<Listing> getListing() {
-        return listing;
     }
 
     public void setOrderDate(LocalDateTime orderDate) {
         this.orderDate = orderDate;
     }
 
-    public LocalDateTime getOrderDate() {
-        return orderDate;
+    public List<Listing> getOrderItems() {
+        return orderItems;
     }
 
-    public void setListing(List<Listing> listing) {
-        this.listing = listing;
+    public void setOrderItems(List<Listing> orderItems) {
+        this.orderItems = orderItems;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
     }
 
     public int getOrderId() {
@@ -59,31 +56,15 @@ public class Order {
     }
 
     public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public User getBuyerId() {
-        return buyer;
-    }
-
-    public void setBuyerId(User buyer) {
-        this.buyer = buyer;
+        return totalPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 
-    public void setSeller(User seller) {
-        this.seller = seller;
-    }
-
     public void setBuyer(User buyer) {
         this.buyer = buyer;
-    }
-
-    public User getSeller() {
-        return seller;
     }
 
     public User getBuyer() {

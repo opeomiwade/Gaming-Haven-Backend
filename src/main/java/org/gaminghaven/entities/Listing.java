@@ -6,6 +6,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class Listing {
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Offer> offers;
+
+    //order associated with this listing.
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @Column
     private String description;
@@ -58,6 +64,14 @@ public class Listing {
         updatedAt = LocalDateTime.now();
         createdAt = LocalDateTime.now();
         status = "available";
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 
     public String getDescription() {
@@ -97,7 +111,7 @@ public class Listing {
     }
 
     public BigDecimal getPrice() {
-        return price;
+        return price.setScale(2, RoundingMode.HALF_UP);
     }
 
     public int getListingId() {

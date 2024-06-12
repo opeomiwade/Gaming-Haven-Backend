@@ -3,10 +3,7 @@ package org.gaminghaven.service;
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.UserNotFound;
-import org.gaminghaven.repos.OrderRepo;
-import org.gaminghaven.repos.ProductRepo;
-import org.gaminghaven.repos.TradeRepo;
-import org.gaminghaven.repos.UserRepo;
+import org.gaminghaven.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,6 +40,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private TradeRepo tradeRepo;
+
+    @Autowired
+    private ListingRepo listingRepo;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -108,27 +108,27 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFound("User does not exist");
         }
         BigDecimal totalExpenses = orderRepo.getUserTotalExpenses(user.getUserId()) == null ? new BigDecimal("0.00") : orderRepo.getUserTotalExpenses(user.getUserId());
-        BigDecimal totalIncome = orderRepo.getUserTotalIncome(user.getUserId()) == null ? new BigDecimal("0.00") : orderRepo.getUserTotalIncome(user.getUserId());
+        BigDecimal totalIncome = listingRepo.getUserTotalIncome(user.getUserId()) == null ? new BigDecimal("0.00") : listingRepo.getUserTotalIncome(user.getUserId());
         BigDecimal netIncome = totalIncome.subtract(totalExpenses);
         BigDecimal totalSales = orderRepo.calculateTotalSales();
         List<Trade> receivedTrades = user.getReceivedTrades();
         List<Trade> sentTrades = user.getInitiatedTrades();
         List<Listing> savedListings = user.getSavedListings();
         List<Listing> userListedProducts = user.getUserListings();
-        List<Order> placedOrders = user.getPlacedOrders();
-        List<Order> receivedOrders = user.getReceivedOrders();
+        List<Order> orders = user.getPlacedOrders();
+        List<Listing> soldListings = listingRepo.getUserSoldListings(user.getUserId());
         List<Offer> sentOffers = user.getSentOffers();
         List<Offer> receivedOffers = user.getReceivedOffers();
         dashboardInfo.put("totalExpenses", totalExpenses);
         dashboardInfo.put("totalIncome", totalIncome);
         dashboardInfo.put("netIncome", netIncome);
-        dashboardInfo.put("totalSales", totalSales);
+        dashboardInfo.put("marketplaceTotalSales", totalSales);
         dashboardInfo.put("receivedTrades", receivedTrades);
         dashboardInfo.put("sentTrades", sentTrades);
         dashboardInfo.put("savedListings", savedListings);
         dashboardInfo.put("listedProducts", userListedProducts);
-        dashboardInfo.put("placedOrders", placedOrders);
-        dashboardInfo.put("receivedOrders", receivedOrders);
+        dashboardInfo.put("orders", orders);
+        dashboardInfo.put("soldListings", soldListings);
         dashboardInfo.put("sentOffers", sentOffers);
         dashboardInfo.put("receivedOffers", receivedOffers);
         return dashboardInfo;

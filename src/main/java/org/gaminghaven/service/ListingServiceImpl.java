@@ -63,4 +63,15 @@ public class ListingServiceImpl implements ListingService {
         listing.setImages(images);
         return listing;
     }
+
+    @Override
+    public List<Listing> getUserSoldListings() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        //get currently logged-in user for new listing
+        User user = userRepo.findByEmail(email);
+        List<Listing> soldListings = listingRepo.getUserSoldListings(user.getUserId());
+        return soldListings;
+
+    }
 }

@@ -79,10 +79,6 @@ public class User {
     @JsonIgnore
     private List<Order> placedOrders;
 
-    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Order> receivedOrders;
-
     //list of products sold by a user
     @ManyToMany
     @JoinTable(name = "user_products",
@@ -216,16 +212,8 @@ public class User {
         return placedOrders;
     }
 
-    public List<Order> getReceivedOrders() {
-        return receivedOrders;
-    }
-
     public void setPlacedOrders(List<Order> placedOrders) {
         this.placedOrders = placedOrders;
-    }
-
-    public void setReceivedOrders(List<Order> receivedOrders) {
-        this.receivedOrders = receivedOrders;
     }
 
     public String getRole() {

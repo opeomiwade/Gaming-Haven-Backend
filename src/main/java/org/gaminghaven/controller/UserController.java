@@ -126,4 +126,16 @@ public class UserController {
         }
         return new ResponseEntity(user.getUserListings(), HttpStatus.OK);
     }
+
+    @GetMapping("/user/purchases")
+    public ResponseEntity getPurchases() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user;
+        try {
+            user = service.getUserByEmail(email);
+            return new ResponseEntity(user.getPlacedOrders(), HttpStatus.OK);
+        } catch (UserNotFound exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }

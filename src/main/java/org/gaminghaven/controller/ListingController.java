@@ -75,4 +75,9 @@ public class ListingController {
         listingService.addListing(listingRequest);
         return new ResponseEntity("Listing posted sucessfully", HttpStatus.OK);
     }
+
+    @GetMapping("/user/sold-listings")
+    public ResponseEntity getUserSoldListings() {
+        return new ResponseEntity(listingService.getUserSoldListings(), HttpStatus.OK);
+    }
 }

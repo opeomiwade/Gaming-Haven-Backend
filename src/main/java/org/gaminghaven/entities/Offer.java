@@ -2,6 +2,7 @@ package org.gaminghaven.entities;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Entity
@@ -63,7 +64,7 @@ public class Offer {
     }
 
     public BigDecimal getOffer() {
-        return offer;
+        return offer.setScale(2, RoundingMode.HALF_UP);
     }
 
     public User getSender() {
