@@ -17,4 +17,7 @@ public interface ProductRepo extends JpaRepository<Product, Integer> {
 
     Product findByProductName(@Param("productName") String productName);
 
+    @Query("select distinct manufacturer from Product")
+    List<String> getManufacturers();
+
 }

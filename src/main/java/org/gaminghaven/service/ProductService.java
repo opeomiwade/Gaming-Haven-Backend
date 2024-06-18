@@ -3,6 +3,8 @@ package org.gaminghaven.service;
 import org.gaminghaven.entities.Product;
 import org.gaminghaven.requestobjects.ListingRequest;
 
+import java.util.List;
+
 public interface ProductService {
 
     /**
@@ -11,4 +13,6 @@ public interface ProductService {
      * @return product - the added product.
      */
     Product addProduct(ListingRequest productRequest);
+
+    List<String> getManufacturers();
 }

@@ -1,5 +1,6 @@
 package org.gaminghaven.controller;
 
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.requestobjects.LoginRequest;
 import org.gaminghaven.entities.Trade;
 import org.gaminghaven.exceptions.UserNotFound;
@@ -135,6 +136,27 @@ public class UserController {
             user = service.getUserByEmail(email);
             return new ResponseEntity(user.getPlacedOrders(), HttpStatus.OK);
         } catch (UserNotFound exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/add-saved-listing")
+    public ResponseEntity addSavedListing(@RequestParam int listingId) {
+        try {
+            service.addSavedListing(listingId);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (UserNotFound | ListingNotFoundException exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+
+        }
+    }
+
+    @DeleteMapping("/remove-saved-listing")
+    public ResponseEntity removeSavedListing(@RequestParam int listingId) {
+        try {
+            service.removeSavedListing(listingId);
+            return new ResponseEntity(HttpStatus.OK);
+        } catch (ListingNotFoundException | UserNotFound exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

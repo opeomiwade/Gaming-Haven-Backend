@@ -2,6 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.InvalidLoginCreds;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.exceptions.UserNotFound;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,4 +45,8 @@ public interface UserService {
      * @throws UserNotFound
      */
     Map<String, ?> getDashBoardInfo(String email) throws UserNotFound;
+
+    void addSavedListing(int listingId) throws UserNotFound, ListingNotFoundException;
+
+    void removeSavedListing(int listingId) throws UserNotFound, ListingNotFoundException;
 }

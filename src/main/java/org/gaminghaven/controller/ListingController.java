@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -36,15 +37,6 @@ public class ListingController {
     @GetMapping("/")
     public ResponseEntity getAllListings() {
         return new ResponseEntity(listingRepo.findAll(), HttpStatus.OK);
-    }
-
-    @GetMapping("/category/{category}")
-    public ResponseEntity getListingsByCategory(@PathVariable String category) {
-        List<Listing> products = listingRepo.findByCategoryName(category);
-        if (products.size() < 1) {
-            return new ResponseEntity("No listings found for that category", HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity(products, HttpStatus.OK);
     }
 
     @GetMapping("/user-listings")
@@ -79,5 +71,29 @@ public class ListingController {
     @GetMapping("/user/sold-listings")
     public ResponseEntity getUserSoldListings() {
         return new ResponseEntity(listingService.getUserSoldListings(), HttpStatus.OK);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity filterListings(@RequestParam(required = false) String categoryName,
+                                         @RequestParam(required = false) String manufacturer,
+                                         @RequestParam(required = false) String condition,
+                                         @RequestParam(required = false) BigDecimal minPrice,
+                                         @RequestParam(required = false) BigDecimal maxPrice) {
+        List<Listing> listings = listingService.filterListings(categoryName, manufacturer, condition, minPrice, maxPrice);
+        if (listings != null) {
+            return new ResponseEntity(listings, HttpStatus.OK);
+        } else {
+            return new ResponseEntity("No listings match this criteria", HttpStatus.NOT_FOUND);
+        }
+
+
+    }
+
+    @GetMapping("/sort")
+    public ResponseEntity sortListings(@RequestParam String sortBy,
+                                       @RequestParam(required = false) String categoryName,
+                                       @RequestParam(required = false) boolean increasing
+    ) {
+        return new ResponseEntity(listingService.sortBy(sortBy, categoryName, increasing), HttpStatus.OK);
     }
 }

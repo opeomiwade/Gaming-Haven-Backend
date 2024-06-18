@@ -2,15 +2,18 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,6 +96,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public User getUserByEmail(String email) throws UserNotFound {
         if (userRepo.findByEmail(email) != null) {
             return userRepo.findByEmail(email);
@@ -101,6 +105,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
     public Map<String, ?> getDashBoardInfo(String email) throws UserNotFound {
         HashMap<String, Object> dashboardInfo = new HashMap<>();
         User user = userRepo.findByEmail(email);
@@ -134,8 +139,30 @@ public class UserServiceImpl implements UserService {
         return dashboardInfo;
     }
 
+    @Override
     public List<User> getAllUsers() {
         return userRepo.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void addSavedListing(int listingId) throws UserNotFound, ListingNotFoundException {
+        Listing listing = listingRepo.findById(listingId).orElseThrow(() -> new ListingNotFoundException("listing not found"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = getUserByEmail(email);
+        user.getSavedListings().add(listing);
+        userRepo.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void removeSavedListing(int listingId) throws UserNotFound, ListingNotFoundException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = getUserByEmail(email);
+        Listing listing = listingRepo.findById(listingId)
+                .orElseThrow(() -> new ListingNotFoundException("Listing not found"));
+        user.getSavedListings().remove(listing);
+        userRepo.save(user);
     }
 }
 

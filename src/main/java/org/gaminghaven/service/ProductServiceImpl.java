@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 
 @Service
@@ -49,5 +50,10 @@ public class ProductServiceImpl implements ProductService {
         }
         user.getProducts().add(product);
         return product;
+    }
+
+    @Override
+    public List<String> getManufacturers() {
+        return productRepo.getManufacturers();
     }
 }

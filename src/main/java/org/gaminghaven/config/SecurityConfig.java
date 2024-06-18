@@ -41,6 +41,8 @@ public class SecurityConfig {
                         .antMatchers("/users/**").authenticated()        // Require authentication for all other /users/** routes
                         .antMatchers("/listings/add").authenticated() // Require authentication for the lsitings route
                         .antMatchers("/listings/delete").authenticated() // Require authentication for the lsitings route
+                        .antMatchers("users/add-saved-listing").authenticated()
+                        .antMatchers("users/remove-saved-listing").authenticated()
                         .anyRequest().permitAll()
                 ).
                 csrf().disable().

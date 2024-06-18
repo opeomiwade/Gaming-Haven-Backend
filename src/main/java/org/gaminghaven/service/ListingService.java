@@ -3,6 +3,7 @@ package org.gaminghaven.service;
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.requestobjects.ListingRequest;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ListingService {
@@ -11,4 +12,13 @@ public interface ListingService {
 
     List<Listing> getUserSoldListings();
 
+    List<Listing> filterListings(String category,
+                                 String condition,
+                                 String manufacturer,
+                                 BigDecimal minPrice,
+                                 BigDecimal maxPrice
+    );
+
+
+    List<Listing> sortBy(String sortBy, String categoryName, boolean increasing);
 }
