@@ -43,7 +43,6 @@ public class ListingController {
     public ResponseEntity getUserListings() {
         User seller = userRepo.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         List<Listing> userListings = listingRepo.findBySeller(seller);
-        System.out.println(userListings);
         if (userListings.size() < 1) {
             return new ResponseEntity("No listings for this user", HttpStatus.NOT_FOUND);
         }
@@ -75,18 +74,16 @@ public class ListingController {
 
     @GetMapping("/filter")
     public ResponseEntity filterListings(@RequestParam(required = false) String categoryName,
-                                         @RequestParam(required = false) String manufacturer,
+                                         @RequestParam(required = false) List<String> manufacturers,
                                          @RequestParam(required = false) String condition,
                                          @RequestParam(required = false) BigDecimal minPrice,
                                          @RequestParam(required = false) BigDecimal maxPrice) {
-        List<Listing> listings = listingService.filterListings(categoryName, manufacturer, condition, minPrice, maxPrice);
+        List<Listing> listings = listingService.filterListings(categoryName, manufacturers, condition, minPrice, maxPrice);
         if (listings != null) {
             return new ResponseEntity(listings, HttpStatus.OK);
         } else {
             return new ResponseEntity("No listings match this criteria", HttpStatus.NOT_FOUND);
         }
-
-
     }
 
     @GetMapping("/sort")

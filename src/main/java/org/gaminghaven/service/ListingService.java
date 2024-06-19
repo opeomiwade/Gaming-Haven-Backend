@@ -13,8 +13,8 @@ public interface ListingService {
     List<Listing> getUserSoldListings();
 
     List<Listing> filterListings(String category,
+                                 List<String> manufacturer,
                                  String condition,
-                                 String manufacturer,
                                  BigDecimal minPrice,
                                  BigDecimal maxPrice
     );

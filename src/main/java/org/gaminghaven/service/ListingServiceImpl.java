@@ -79,7 +79,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<Listing> filterListings(String categoryName,
-                                        String manufacturer,
+                                        List<String> manufacturers,
                                         String condition,
                                         BigDecimal minPrice,
                                         BigDecimal maxPrice) {
@@ -95,9 +95,25 @@ public class ListingServiceImpl implements ListingService {
                     cb.equal(cb.lower(root.get("condition")), condition.toLowerCase())));
         }
 
-        if (manufacturer != null) {
+        if (manufacturers != null && manufacturers.size() == 1) {
             spec = spec.and(((root, query, cb) ->
-                    cb.equal(cb.lower(root.get("listedProduct").get("manufacturer")), manufacturer.toLowerCase())));
+                    cb.equal(cb.lower(root.get("listedProduct").get("manufacturer")), manufacturers.get(0).toLowerCase())));
+        }
+
+        if (manufacturers != null && manufacturers.size() > 1) {
+
+            // create null specification object for multiple manufacturer situation
+            Specification<Listing> manufacturersSpec = Specification.where(null);
+
+            for (String manufacturer : manufacturers) {
+                // build spec object by checking if the manufacturer in the listing is
+                // equal to either manufacturer in the manufacturer list
+                manufacturersSpec = manufacturersSpec.or((root, query, cb) ->
+                        cb.equal(cb.lower(root.get("listedProduct").get("manufacturer")),
+                                manufacturer.toLowerCase()));
+
+            }
+            spec = spec.and(manufacturersSpec);
         }
 
         if (minPrice != null && maxPrice != null) {
@@ -119,7 +135,6 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public List<Listing> sortBy(String sortBy, String categoryName, boolean increasing) {
-        System.out.println(increasing);
         Specification<Listing> spec = Specification.where(null);
         if (increasing) {
             spec = spec.and(((root, query, cb) -> {
