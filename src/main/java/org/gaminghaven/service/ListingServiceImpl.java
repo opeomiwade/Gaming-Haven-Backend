@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Sort;
+
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -82,7 +84,9 @@ public class ListingServiceImpl implements ListingService {
                                         List<String> manufacturers,
                                         String condition,
                                         BigDecimal minPrice,
-                                        BigDecimal maxPrice) {
+                                        BigDecimal maxPrice,
+                                        String sortBy,
+                                        boolean increasing) {
         Specification<Listing> spec = Specification.where(null);
         if (categoryName != null) {
             spec = spec.and(((root, query, cb) ->
@@ -129,6 +133,10 @@ public class ListingServiceImpl implements ListingService {
         if (maxPrice == null && minPrice != null) {
             spec = spec.and(((root, query, cb) ->
                     cb.greaterThanOrEqualTo(root.get("price"), minPrice)));
+        }
+        if (sortBy != null) {
+            Sort sort = Sort.by(increasing ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+            return listingRepo.findAll(spec, sort);
         }
         return listingRepo.findAll(spec);
     }

@@ -77,8 +77,10 @@ public class ListingController {
                                          @RequestParam(required = false) List<String> manufacturers,
                                          @RequestParam(required = false) String condition,
                                          @RequestParam(required = false) BigDecimal minPrice,
-                                         @RequestParam(required = false) BigDecimal maxPrice) {
-        List<Listing> listings = listingService.filterListings(categoryName, manufacturers, condition, minPrice, maxPrice);
+                                         @RequestParam(required = false) BigDecimal maxPrice,
+                                         @RequestParam(required = false) String sortBy,
+                                         @RequestParam(required = false) boolean increasing) {
+        List<Listing> listings = listingService.filterListings(categoryName, manufacturers, condition, minPrice, maxPrice, sortBy, increasing);
         if (listings != null) {
             return new ResponseEntity(listings, HttpStatus.OK);
         } else {

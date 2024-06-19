@@ -16,7 +16,9 @@ public interface ListingService {
                                  List<String> manufacturer,
                                  String condition,
                                  BigDecimal minPrice,
-                                 BigDecimal maxPrice
+                                 BigDecimal maxPrice,
+                                 String sortBy,
+                                 boolean increasing
     );
 
 
