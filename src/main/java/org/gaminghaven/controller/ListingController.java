@@ -1,7 +1,11 @@
 package org.gaminghaven.controller;
 
+import org.apache.coyote.Response;
 import org.gaminghaven.entities.Listing;
+import org.gaminghaven.entities.Product;
 import org.gaminghaven.entities.User;
+import org.gaminghaven.exceptions.ImageNotFound;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.repos.ListingRepo;
 import org.gaminghaven.repos.UserRepo;
 import org.gaminghaven.requestobjects.ListingRequest;
@@ -62,9 +66,13 @@ public class ListingController {
     @PostMapping("/add")
     @Transactional
     public ResponseEntity addListing(@RequestBody ListingRequest listingRequest) {
-        productService.addProduct(listingRequest);
-        listingService.addListing(listingRequest);
-        return new ResponseEntity("Listing posted sucessfully", HttpStatus.OK);
+        try {
+            productService.addProduct(listingRequest);
+            listingService.addListing(listingRequest);
+            return new ResponseEntity("Listing posted sucessfully", HttpStatus.OK);
+        } catch (Exception exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/user/sold-listings")
@@ -75,16 +83,16 @@ public class ListingController {
     @GetMapping("/filter")
     public ResponseEntity filterListings(@RequestParam(required = false) String categoryName,
                                          @RequestParam(required = false) List<String> manufacturers,
-                                         @RequestParam(required = false) String condition,
+                                         @RequestParam(required = false) List<String> condition,
                                          @RequestParam(required = false) BigDecimal minPrice,
                                          @RequestParam(required = false) BigDecimal maxPrice,
                                          @RequestParam(required = false) String sortBy,
                                          @RequestParam(required = false) boolean increasing) {
         List<Listing> listings = listingService.filterListings(categoryName, manufacturers, condition, minPrice, maxPrice, sortBy, increasing);
-        if (listings != null) {
+        if (listings.size() > 0 && listings != null) {
             return new ResponseEntity(listings, HttpStatus.OK);
         } else {
-            return new ResponseEntity("No listings match this criteria", HttpStatus.NOT_FOUND);
+            return new ResponseEntity("No listings match this criteria", HttpStatus.OK);
         }
     }
 
@@ -94,5 +102,18 @@ public class ListingController {
                                        @RequestParam(required = false) boolean increasing
     ) {
         return new ResponseEntity(listingService.sortBy(sortBy, categoryName, increasing), HttpStatus.OK);
+    }
+
+
+    @PutMapping("/edit")
+    @Transactional
+    public ResponseEntity editListing(@RequestParam int listingId, @RequestBody ListingRequest listingRequest) {
+        try {
+            productService.updateListedProduct(listingRequest.getProductName(), listingRequest.getCategoryName(), listingRequest.getManufacturer());
+            listingService.editListing(listingId, listingRequest);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (ListingNotFoundException | ImageNotFound exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 }

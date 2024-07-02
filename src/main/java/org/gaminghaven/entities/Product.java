@@ -19,7 +19,7 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String productName;
 
-    @Column(name = "product_type", nullable = false)
+    @Column(name = "product_type")
     private String productType;
 
     @Column

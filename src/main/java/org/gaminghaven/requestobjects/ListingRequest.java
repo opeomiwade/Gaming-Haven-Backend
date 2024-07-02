@@ -1,11 +1,14 @@
 package org.gaminghaven.requestobjects;
 
+import org.gaminghaven.entities.ListingImage;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ListingRequest {
     private String productName;
 
-    private String productType;
+    private String categoryName;
 
     private String condition;
 
@@ -14,6 +17,8 @@ public class ListingRequest {
     private BigDecimal price;
 
     private String[] imageUrls;
+
+    private List<ListingImage> images;
 
     private String manufacturer;
 
@@ -33,12 +38,16 @@ public class ListingRequest {
         return description;
     }
 
+    public List<ListingImage> getImages() {
+        return images;
+    }
+
     public String getProductName() {
         return productName;
     }
 
-    public String getProductType() {
-        return productType;
+    public String getCategoryName() {
+        return categoryName;
     }
 
     public String getManufacturer() {

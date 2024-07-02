@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,6 +36,7 @@ public class SecurityConfig {
                 and().
                 authorizeHttpRequests((authorize) -> authorize
                         .antMatchers("/users/login").permitAll()             // Allow access without authentication
+                        .antMatchers("/users/signup").permitAll()             // Allow access without authentication
                         .antMatchers("/users/user/{email}").permitAll()      // Allow access without authentication
                         .antMatchers("/users/**").authenticated()        // Require authentication for all other /users/** routes
                         .antMatchers("/listings/add").authenticated() // Require authentication for the lsitings route

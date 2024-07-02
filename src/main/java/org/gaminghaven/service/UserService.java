@@ -3,6 +3,7 @@ package org.gaminghaven.service;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.InvalidLoginCreds;
 import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.exceptions.UserNotFound;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public interface UserService {
      * @param user
      * @return
      */
-    Map<String, String> createNewUser(User user) throws UserNotFound;
+    Map<String, String> createNewUser(User user) throws UserNotFound, PersistenceException;
 
     /**
      * @param email

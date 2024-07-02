@@ -1,8 +1,10 @@
 package org.gaminghaven.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,10 +17,11 @@ public class User {
     private int userId;
 
     @Column(nullable = false, unique = true, length = 100)
+    @Email(message = "Email is in an invalid format")
     private String email;
 
     @Column(length = 500, name = "password_hash")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false, unique = true, length = 100)

@@ -1,13 +1,9 @@
 package org.gaminghaven.service;
 
-import org.gaminghaven.entities.Listing;
-import org.gaminghaven.entities.ListingImage;
-import org.gaminghaven.entities.Product;
-import org.gaminghaven.entities.User;
-import org.gaminghaven.repos.ListingImageRepo;
-import org.gaminghaven.repos.ListingRepo;
-import org.gaminghaven.repos.ProductRepo;
-import org.gaminghaven.repos.UserRepo;
+import org.gaminghaven.entities.*;
+import org.gaminghaven.exceptions.ImageNotFound;
+import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.repos.*;
 import org.gaminghaven.requestobjects.ListingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,7 +14,9 @@ import org.springframework.data.domain.Sort;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -36,28 +34,32 @@ public class ListingServiceImpl implements ListingService {
     @Autowired
     ProductRepo productRepo;
 
+    @Autowired
+    CategoryRepo categoryRepo;
+
+
     @Override
     @Transactional
-    public Listing addListing(ListingRequest productRequest) {
+    public Listing addListing(ListingRequest listingRequest) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         //get currently logged in user for new listing
         User user = userRepo.findByEmail(email);
 
         // find product associated with the new listing
-        Product product = productRepo.findByProductName(productRequest.getProductName());
+        Product product = productRepo.findByProductName(listingRequest.getProductName());
 
         Listing listing = new Listing();
         listing.setListedProduct(product);
-        listing.setCondition(productRequest.getCondition());
-        listing.setDescription(productRequest.getDescription());
-        listing.setPrice(productRequest.getPrice());
+        listing.setCondition(listingRequest.getCondition());
+        listing.setDescription(listingRequest.getDescription());
+        listing.setPrice(listingRequest.getPrice());
         listing.setSeller(user);
         listingRepo.save(listing);
 
         // add all images associated with this listing
         List<ListingImage> images = new ArrayList<>();
-        for (String imageUrl : productRequest.getImageUrls()) {
+        for (String imageUrl : listingRequest.getImageUrls()) {
             ListingImage listingImage = new ListingImage();
             listingImage.setImageUrl(imageUrl);
             listingImage.setListing(listing);
@@ -82,7 +84,7 @@ public class ListingServiceImpl implements ListingService {
     @Override
     public List<Listing> filterListings(String categoryName,
                                         List<String> manufacturers,
-                                        String condition,
+                                        List<String> condition,
                                         BigDecimal minPrice,
                                         BigDecimal maxPrice,
                                         String sortBy,
@@ -94,9 +96,25 @@ public class ListingServiceImpl implements ListingService {
                             categoryName.toLowerCase())));
         }
 
-        if (condition != null) {
+        if (condition != null && condition.size() == 1) {
             spec = spec.and(((root, query, cb) ->
-                    cb.equal(cb.lower(root.get("condition")), condition.toLowerCase())));
+                    cb.equal(cb.lower(root.get("condition")), condition.get(0).toLowerCase())));
+        }
+
+        if (condition != null && condition.size() > 1) {
+
+            // create null specification object for multiple manufacturer situation
+            Specification<Listing> conditionsSpec = Specification.where(null);
+
+            for (String c : condition) {
+                // build spec object by checking if the manufacturer in the listing is
+                // equal to either manufacturer in the manufacturer list
+                conditionsSpec = conditionsSpec.or((root, query, cb) ->
+                        cb.equal(cb.lower(root.get("condition")),
+                                c.toLowerCase()));
+
+            }
+            spec = spec.and(conditionsSpec);
         }
 
         if (manufacturers != null && manufacturers.size() == 1) {
@@ -134,6 +152,7 @@ public class ListingServiceImpl implements ListingService {
             spec = spec.and(((root, query, cb) ->
                     cb.greaterThanOrEqualTo(root.get("price"), minPrice)));
         }
+
         if (sortBy != null) {
             Sort sort = Sort.by(increasing ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
             return listingRepo.findAll(spec, sort);
@@ -160,5 +179,34 @@ public class ListingServiceImpl implements ListingService {
             ));
         }
         return listingRepo.findAll(spec);
+    }
+
+    @Override
+    public Listing editListing(int listingId, ListingRequest listingRequest) throws ListingNotFoundException, ImageNotFound {
+        Listing listingToEdit = listingRepo.findById(listingId).
+                orElseThrow(() -> new ListingNotFoundException("No Listing with that Id was found"));
+        if (listingRequest.getPrice() != null) {
+            listingToEdit.setPrice(listingRequest.getPrice());
+        }
+
+        if (listingRequest.getCondition() != null) {
+            listingToEdit.setCondition(listingRequest.getCondition());
+        }
+
+        if (listingRequest.getDescription() != null) {
+            listingToEdit.setDescription(listingRequest.getDescription());
+        }
+
+        if (listingRequest.getImages() != null) {
+            for (ListingImage listingImage : listingRequest.getImages()) {
+                ListingImage image = listingImageRepo.findById(listingImage.getImageId()).
+                        orElseThrow(() -> new ImageNotFound("Image Not Found"));
+                image.setImageUrl(listingImage.getImageUrl());
+                listingImageRepo.save(image);
+            }
+        }
+        listingToEdit.setUpdatedAt(LocalDateTime.now());
+        listingRepo.save(listingToEdit);
+        return listingToEdit;
     }
 }

@@ -3,6 +3,7 @@ package org.gaminghaven.service;
 import org.gaminghaven.entities.Category;
 import org.gaminghaven.entities.Product;
 import org.gaminghaven.entities.User;
+import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.repos.CategoryRepo;
 import org.gaminghaven.repos.ListingImageRepo;
 import org.gaminghaven.repos.ProductRepo;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -33,22 +35,62 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Product addProduct(ListingRequest listingRequest) {
+    public Product addProduct(ListingRequest listingRequest) throws PersistenceException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(email);
         Product product = null;
+        if (listingRequest.getProductName() == null ||
+                listingRequest.getCategoryName() == null ||
+                listingRequest.getManufacturer() == null ||
+                listingRequest.getCondition() == null ||
+                listingRequest.getDescription() == null |
+                        listingRequest.getImageUrls() == null ||
+                listingRequest.getPrice() == null) {
+            throw new PersistenceException("Please fill in all details");
+        }
         if (productRepo.findByProductName(listingRequest.getProductName()) == null) {
             product = new Product();
             product.setProductName(listingRequest.getProductName());
-            product.setProductType(listingRequest.getProductType());
+            product.setProductType(listingRequest.getCategoryName());
             product.setManufacturer(listingRequest.getManufacturer());
-            Category category = categoryRepo.findByName(listingRequest.getProductType());
+            Category category = categoryRepo.findByName(listingRequest.getCategoryName());
             product.setCategory(category);
             productRepo.save(product);
         } else {
             product = productRepo.findByProductName(listingRequest.getProductName());
         }
         user.getProducts().add(product);
+        return product;
+    }
+
+    @Override
+    public Product updateListedProduct(String productName, String categoryName, String manufacturer) {
+        Product product = productRepo.findByProductName(productName);
+        boolean edited = false;
+
+        if (product == null) {
+            Product newProduct = new Product();
+            if (manufacturer != null) newProduct.setManufacturer(manufacturer);
+            if (productName != null) newProduct.setProductName(productName);
+            if (categoryName != null) newProduct.setCategory(categoryRepo.findByName(categoryName));
+            productRepo.save(newProduct);
+            return newProduct;
+        }
+        if (categoryName != null && !categoryName.equals(product.getCategory().getName())) {
+            System.out.println(product.getCategory().getName());
+            Category updatedCategory = categoryRepo.findByName(categoryName);
+            product.setCategory(updatedCategory);
+            edited = true;
+        }
+        if (manufacturer != null && !manufacturer.equals(product.getManufacturer())) {
+            product.setManufacturer(manufacturer);
+            edited = true;
+        }
+
+        if (edited) {
+            product.setUpdatedAt(LocalDateTime.now());
+            productRepo.save(product);
+        }
         return product;
     }
 

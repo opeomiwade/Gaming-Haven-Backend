@@ -3,6 +3,7 @@ package org.gaminghaven.service;
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.repos.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.*;
 
 @Service
@@ -57,9 +61,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, String> createNewUser(User user) throws UserNotFound {
+    public Map<String, String> createNewUser(User user) throws PersistenceException {
         if (user.getEmail() == null || user.getPassword() == null || user.getUsername() == null) {
-            throw new UserNotFound("Please fill in all details");
+            throw new PersistenceException("Please fill in all details");
         } else {
             HashMap<String, String> responseBody = new HashMap<>();
             String hashedPassword = passwordEncoder.encode(user.getPassword());
@@ -75,7 +79,15 @@ public class UserServiceImpl implements UserService {
                 responseBody.put("message", "User created successfully");
                 responseBody.put("token", jwtToken);
             } catch (Exception exception) {
-                throw new UserNotFound("A user with that email or username exists, try again");
+                if (exception instanceof ConstraintViolationException) {
+                    ConstraintViolationException constraintViolationException = (ConstraintViolationException) exception;
+                    Set<ConstraintViolation<?>> violations = constraintViolationException.getConstraintViolations();
+                    for (ConstraintViolation<?> violation : violations) {
+                        String errorMessage = violation.getMessageTemplate();
+                        throw new PersistenceException(errorMessage);
+                    }
+                }
+                throw new PersistenceException("A user with that username of email already exists");
             }
             return responseBody;
         }

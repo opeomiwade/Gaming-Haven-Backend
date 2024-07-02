@@ -1,6 +1,7 @@
 package org.gaminghaven.controller;
 
 import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.requestobjects.LoginRequest;
 import org.gaminghaven.entities.Trade;
 import org.gaminghaven.exceptions.UserNotFound;
@@ -36,7 +37,7 @@ public class UserController {
     public ResponseEntity register(@RequestBody User user) {
         try {
             return new ResponseEntity<>(service.createNewUser(user), HttpStatus.CREATED);
-        } catch (UserNotFound exception) {
+        } catch (PersistenceException exception) {
             return ResponseEntity.badRequest().body(exception.getMessage());
         }
     }

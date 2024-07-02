@@ -1,6 +1,8 @@
 package org.gaminghaven.service;
 
 import org.gaminghaven.entities.Listing;
+import org.gaminghaven.exceptions.ImageNotFound;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.requestobjects.ListingRequest;
 
 import java.math.BigDecimal;
@@ -14,13 +16,14 @@ public interface ListingService {
 
     List<Listing> filterListings(String category,
                                  List<String> manufacturer,
-                                 String condition,
+                                 List<String> condition,
                                  BigDecimal minPrice,
                                  BigDecimal maxPrice,
                                  String sortBy,
                                  boolean increasing
     );
 
-
     List<Listing> sortBy(String sortBy, String categoryName, boolean increasing);
+
+    Listing editListing(int listingId, ListingRequest listingRequest) throws ListingNotFoundException, ImageNotFound;
 }
