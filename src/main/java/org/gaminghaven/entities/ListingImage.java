@@ -1,6 +1,9 @@
 package org.gaminghaven.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -18,6 +21,7 @@ public class ListingImage {
     @ManyToOne
     @JoinColumn(name = "listing_id", nullable = false)
     @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Listing listing;
 
     public void setImageUrl(String imageUrl) {

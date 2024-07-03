@@ -16,7 +16,6 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -199,8 +198,10 @@ public class ListingServiceImpl implements ListingService {
 
         if (listingRequest.getImages() != null) {
             for (ListingImage listingImage : listingRequest.getImages()) {
-                ListingImage image = listingImageRepo.findById(listingImage.getImageId()).
-                        orElseThrow(() -> new ImageNotFound("Image Not Found"));
+                ListingImage image = listingImageRepo.findById(listingImage.getImageId()).orElse(null);
+                if (image == null) {
+                    System.out.println(image);
+                }
                 image.setImageUrl(listingImage.getImageUrl());
                 listingImageRepo.save(image);
             }
@@ -208,5 +209,12 @@ public class ListingServiceImpl implements ListingService {
         listingToEdit.setUpdatedAt(LocalDateTime.now());
         listingRepo.save(listingToEdit);
         return listingToEdit;
+    }
+
+    @Override
+    public void deleteListing(int listingId) throws ListingNotFoundException {
+        Listing listingToDelete = listingRepo.findById(listingId).
+                orElseThrow(() -> new ListingNotFoundException("No listing with that id exists"));
+        listingRepo.delete(listingToDelete);
     }
 }

@@ -26,4 +26,6 @@ public interface ListingService {
     List<Listing> sortBy(String sortBy, String categoryName, boolean increasing);
 
     Listing editListing(int listingId, ListingRequest listingRequest) throws ListingNotFoundException, ImageNotFound;
+
+    void deleteListing(int listingId) throws ListingNotFoundException;
 }

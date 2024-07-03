@@ -81,13 +81,7 @@ public class ListingController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity filterListings(@RequestParam(required = false) String categoryName,
-                                         @RequestParam(required = false) List<String> manufacturers,
-                                         @RequestParam(required = false) List<String> condition,
-                                         @RequestParam(required = false) BigDecimal minPrice,
-                                         @RequestParam(required = false) BigDecimal maxPrice,
-                                         @RequestParam(required = false) String sortBy,
-                                         @RequestParam(required = false) boolean increasing) {
+    public ResponseEntity filterListings(@RequestParam(required = false) String categoryName, @RequestParam(required = false) List<String> manufacturers, @RequestParam(required = false) List<String> condition, @RequestParam(required = false) BigDecimal minPrice, @RequestParam(required = false) BigDecimal maxPrice, @RequestParam(required = false) String sortBy, @RequestParam(required = false) boolean increasing) {
         List<Listing> listings = listingService.filterListings(categoryName, manufacturers, condition, minPrice, maxPrice, sortBy, increasing);
         if (listings.size() > 0 && listings != null) {
             return new ResponseEntity(listings, HttpStatus.OK);
@@ -97,13 +91,9 @@ public class ListingController {
     }
 
     @GetMapping("/sort")
-    public ResponseEntity sortListings(@RequestParam String sortBy,
-                                       @RequestParam(required = false) String categoryName,
-                                       @RequestParam(required = false) boolean increasing
-    ) {
+    public ResponseEntity sortListings(@RequestParam String sortBy, @RequestParam(required = false) String categoryName, @RequestParam(required = false) boolean increasing) {
         return new ResponseEntity(listingService.sortBy(sortBy, categoryName, increasing), HttpStatus.OK);
     }
-
 
     @PutMapping("/edit")
     @Transactional
@@ -111,8 +101,18 @@ public class ListingController {
         try {
             productService.updateListedProduct(listingRequest.getProductName(), listingRequest.getCategoryName(), listingRequest.getManufacturer());
             listingService.editListing(listingId, listingRequest);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>("Listing updated successfully", HttpStatus.OK);
         } catch (ListingNotFoundException | ImageNotFound exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteListing(@RequestParam int listingId) {
+        try {
+            listingService.deleteListing(listingId);
+            return new ResponseEntity("Listing deleted successfully", HttpStatus.OK);
+        } catch (ListingNotFoundException exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
