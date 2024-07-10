@@ -1,6 +1,6 @@
 package org.gaminghaven.controller;
 
-import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.requestobjects.LoginRequest;
 import org.gaminghaven.entities.Trade;
@@ -146,7 +146,7 @@ public class UserController {
         try {
             service.addSavedListing(listingId);
             return new ResponseEntity(HttpStatus.OK);
-        } catch (UserNotFound | ListingNotFoundException exception) {
+        } catch (UserNotFound | ProductNotFound exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
 
         }
@@ -157,7 +157,7 @@ public class UserController {
         try {
             service.removeSavedListing(listingId);
             return new ResponseEntity(HttpStatus.OK);
-        } catch (ListingNotFoundException | UserNotFound exception) {
+        } catch (ProductNotFound | UserNotFound exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

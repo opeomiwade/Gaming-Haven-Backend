@@ -2,6 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.Product;
 import org.gaminghaven.exceptions.PersistenceException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.requestobjects.ListingRequest;
 
 import java.util.List;
@@ -18,4 +19,8 @@ public interface ProductService {
     Product updateListedProduct(String productName, String categoryName, String manufacturer);
 
     List<String> getManufacturers();
+
+    Product getProductById(int productId) throws ProductNotFound;
+
+    List<Product> filterProducts(String categoryName, String productName, String manufacturer);
 }

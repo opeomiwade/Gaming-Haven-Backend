@@ -2,7 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.ImageNotFound;
-import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.repos.*;
 import org.gaminghaven.requestobjects.ListingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,12 +102,12 @@ public class ListingServiceImpl implements ListingService {
 
         if (condition != null && condition.size() > 1) {
 
-            // create null specification object for multiple manufacturer situation
+            // create null specification object for multiple conditions situation
             Specification<Listing> conditionsSpec = Specification.where(null);
 
             for (String c : condition) {
-                // build spec object by checking if the manufacturer in the listing is
-                // equal to either manufacturer in the manufacturer list
+                // build spec object by checking if the condition in the listing is
+                // equal to either condition in the condition list
                 conditionsSpec = conditionsSpec.or((root, query, cb) ->
                         cb.equal(cb.lower(root.get("condition")),
                                 c.toLowerCase()));
@@ -181,9 +181,9 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public Listing editListing(int listingId, ListingRequest listingRequest) throws ListingNotFoundException, ImageNotFound {
+    public Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound, ImageNotFound {
         Listing listingToEdit = listingRepo.findById(listingId).
-                orElseThrow(() -> new ListingNotFoundException("No Listing with that Id was found"));
+                orElseThrow(() -> new ProductNotFound("No Listing with that Id was found"));
         if (listingRequest.getPrice() != null) {
             listingToEdit.setPrice(listingRequest.getPrice());
         }
@@ -212,9 +212,9 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public void deleteListing(int listingId) throws ListingNotFoundException {
+    public void deleteListing(int listingId) throws ProductNotFound {
         Listing listingToDelete = listingRepo.findById(listingId).
-                orElseThrow(() -> new ListingNotFoundException("No listing with that id exists"));
+                orElseThrow(() -> new ProductNotFound("No listing with that id exists"));
         listingRepo.delete(listingToDelete);
     }
 }

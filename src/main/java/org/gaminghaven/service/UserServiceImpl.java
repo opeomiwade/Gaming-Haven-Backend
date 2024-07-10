@@ -2,7 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
-import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.exceptions.UserNotFound;
 import org.gaminghaven.repos.*;
@@ -22,7 +22,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.*;
 
 @Service
@@ -158,8 +157,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void addSavedListing(int listingId) throws UserNotFound, ListingNotFoundException {
-        Listing listing = listingRepo.findById(listingId).orElseThrow(() -> new ListingNotFoundException("listing not found"));
+    public void addSavedListing(int listingId) throws UserNotFound, ProductNotFound {
+        Listing listing = listingRepo.findById(listingId).orElseThrow(() -> new ProductNotFound("listing not found"));
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = getUserByEmail(email);
         user.getSavedListings().add(listing);
@@ -168,11 +167,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void removeSavedListing(int listingId) throws UserNotFound, ListingNotFoundException {
+    public void removeSavedListing(int listingId) throws UserNotFound, ProductNotFound {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = getUserByEmail(email);
         Listing listing = listingRepo.findById(listingId)
-                .orElseThrow(() -> new ListingNotFoundException("Listing not found"));
+                .orElseThrow(() -> new ProductNotFound("Listing not found"));
         user.getSavedListings().remove(listing);
         userRepo.save(user);
     }

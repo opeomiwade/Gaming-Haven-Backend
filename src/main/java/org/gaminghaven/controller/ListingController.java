@@ -1,11 +1,9 @@
 package org.gaminghaven.controller;
 
-import org.apache.coyote.Response;
 import org.gaminghaven.entities.Listing;
-import org.gaminghaven.entities.Product;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.ImageNotFound;
-import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.repos.ListingRepo;
 import org.gaminghaven.repos.UserRepo;
 import org.gaminghaven.requestobjects.ListingRequest;
@@ -102,7 +100,7 @@ public class ListingController {
             productService.updateListedProduct(listingRequest.getProductName(), listingRequest.getCategoryName(), listingRequest.getManufacturer());
             listingService.editListing(listingId, listingRequest);
             return new ResponseEntity<>("Listing updated successfully", HttpStatus.OK);
-        } catch (ListingNotFoundException | ImageNotFound exception) {
+        } catch (ProductNotFound | ImageNotFound exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
@@ -112,7 +110,7 @@ public class ListingController {
         try {
             listingService.deleteListing(listingId);
             return new ResponseEntity("Listing deleted successfully", HttpStatus.OK);
-        } catch (ListingNotFoundException exception) {
+        } catch (ProductNotFound exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

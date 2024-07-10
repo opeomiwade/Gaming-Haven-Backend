@@ -4,12 +4,14 @@ import org.gaminghaven.entities.Category;
 import org.gaminghaven.entities.Product;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.PersistenceException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.repos.CategoryRepo;
 import org.gaminghaven.repos.ListingImageRepo;
 import org.gaminghaven.repos.ProductRepo;
 import org.gaminghaven.repos.UserRepo;
 import org.gaminghaven.requestobjects.ListingRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(email);
         Product product = null;
+
         if (listingRequest.getProductName() == null ||
                 listingRequest.getCategoryName() == null ||
                 listingRequest.getManufacturer() == null ||
@@ -59,7 +62,8 @@ public class ProductServiceImpl implements ProductService {
         } else {
             product = productRepo.findByProductName(listingRequest.getProductName());
         }
-        user.getProducts().add(product);
+        //prevents duplicates entries in table,ensures composite primary key constraint is maintained
+        if (!user.getProducts().contains(product)) user.getProducts().add(product);
         return product;
     }
 
@@ -76,12 +80,13 @@ public class ProductServiceImpl implements ProductService {
             productRepo.save(newProduct);
             return newProduct;
         }
+
         if (categoryName != null && !categoryName.equals(product.getCategory().getName())) {
-            System.out.println(product.getCategory().getName());
             Category updatedCategory = categoryRepo.findByName(categoryName);
             product.setCategory(updatedCategory);
             edited = true;
         }
+
         if (manufacturer != null && !manufacturer.equals(product.getManufacturer())) {
             product.setManufacturer(manufacturer);
             edited = true;
@@ -97,5 +102,32 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<String> getManufacturers() {
         return productRepo.getManufacturers();
+    }
+
+    @Override
+    public Product getProductById(int productId) throws ProductNotFound {
+        return productRepo.findById(productId).
+                orElseThrow(() -> new ProductNotFound("Product with that id does not exist"));
+    }
+
+    @Override
+    public List<Product> filterProducts(String categoryName, String productName, String manufacturer) {
+        Specification spec = Specification.where(null);
+
+        if (categoryName != null)
+            spec = spec.and(((root, query, cb) ->
+                cb.equal(cb.lower(root.get("category").get("name")), categoryName.toLowerCase())));
+
+        if(productName != null)
+            spec = spec.and(((root, query, cb) ->
+                cb.equal(cb.lower(root.get("productName")), productName.toLowerCase())));
+
+
+        if(manufacturer != null)
+            spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(criteriaBuilder.lower(root.get("manufacturer")),
+                        manufacturer.toLowerCase()));
+
+        return productRepo.findAll(spec);
     }
 }

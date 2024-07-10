@@ -37,6 +37,9 @@ public class Listing {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @ManyToMany(mappedBy = "savedListings")
+    private List<User> savedBy;
+
     @Column
     private String description;
 

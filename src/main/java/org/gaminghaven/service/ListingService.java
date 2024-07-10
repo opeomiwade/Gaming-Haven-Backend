@@ -2,7 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.exceptions.ImageNotFound;
-import org.gaminghaven.exceptions.ListingNotFoundException;
+import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.requestobjects.ListingRequest;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public interface ListingService {
 
     List<Listing> sortBy(String sortBy, String categoryName, boolean increasing);
 
-    Listing editListing(int listingId, ListingRequest listingRequest) throws ListingNotFoundException, ImageNotFound;
+    Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound, ImageNotFound;
 
-    void deleteListing(int listingId) throws ListingNotFoundException;
+    void deleteListing(int listingId) throws ProductNotFound;
 }
