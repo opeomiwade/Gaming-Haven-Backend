@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     public Product addProduct(ListingRequest listingRequest) throws PersistenceException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(email);
-        Product product = null;
+        Product product;
 
         if (listingRequest.getProductName() == null ||
                 listingRequest.getCategoryName() == null ||
@@ -51,7 +51,9 @@ public class ProductServiceImpl implements ProductService {
                 listingRequest.getPrice() == null) {
             throw new PersistenceException("Please fill in all details");
         }
-        if (productRepo.findByProductName(listingRequest.getProductName()) == null) {
+
+        Product foundProduct = productRepo.findByProductName(listingRequest.getProductName());
+        if (foundProduct == null) {
             product = new Product();
             product.setProductName(listingRequest.getProductName());
             product.setProductType(listingRequest.getCategoryName());
@@ -59,8 +61,19 @@ public class ProductServiceImpl implements ProductService {
             Category category = categoryRepo.findByName(listingRequest.getCategoryName());
             product.setCategory(category);
             productRepo.save(product);
-        } else {
+        } else if(foundProduct.getCategory().
+                getName().equals(listingRequest.getCategoryName()) &&
+                foundProduct.getManufacturer().equals(listingRequest.getManufacturer())) {
             product = productRepo.findByProductName(listingRequest.getProductName());
+        }else{
+            // Create a new product if category or manufacturer doesn't match
+            product = new Product();
+            product.setProductName(listingRequest.getProductName());
+            product.setProductType(listingRequest.getCategoryName());
+            product.setManufacturer(listingRequest.getManufacturer());
+            Category category = categoryRepo.findByName(listingRequest.getCategoryName());
+            product.setCategory(category);
+            productRepo.save(product);
         }
         //prevents duplicates entries in table,ensures composite primary key constraint is maintained
         if (!user.getProducts().contains(product)) user.getProducts().add(product);
