@@ -1,5 +1,4 @@
 package org.gaminghaven.controller;
-
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.ImageNotFound;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;

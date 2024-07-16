@@ -1,5 +1,6 @@
 package org.gaminghaven.controller;
 
+import org.gaminghaven.exceptions.InvalidGoogleIdToken;
 import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.requestobjects.LoginRequest;
@@ -48,6 +49,15 @@ public class UserController {
             return new ResponseEntity(service.loginUser(loginRequest.getEmail(), loginRequest.getPassword(), response, request), HttpStatus.OK);
         } catch (AuthenticationException exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @GetMapping("/access-token")
+    public ResponseEntity getAccessToken(@RequestParam String email, @RequestParam String googleIdToken) {
+        try {
+            return new ResponseEntity(service.getAccessToken(email, googleIdToken), HttpStatus.OK);
+        } catch (InvalidGoogleIdToken exception) {
+            return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 

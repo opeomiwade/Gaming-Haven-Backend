@@ -2,6 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.config.JwtService;
 import org.gaminghaven.entities.*;
+import org.gaminghaven.exceptions.InvalidGoogleIdToken;
 import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.exceptions.PersistenceException;
 import org.gaminghaven.exceptions.UserNotFound;
@@ -97,7 +98,7 @@ public class UserServiceImpl implements UserService {
         HashMap<String, String> responseBody = new HashMap<>();
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    email, password));
+                    email, password)); //authenticates user using the AuthenticationManager class and the loadByUsername from UserDetailsService
             String idToken = jwtService.generateToken(email);
             responseBody.put("accessToken", idToken);
             responseBody.put("message", "user logged in successfully");
@@ -106,6 +107,21 @@ public class UserServiceImpl implements UserService {
             throw exception;
         }
     }
+
+    @Override
+    public Map<String, String> getAccessToken(String email, String googleIdToken) throws InvalidGoogleIdToken {
+        if (jwtService.googleTokenIsValid(email, googleIdToken)) {
+            HashMap<String, String> responseBody = new HashMap<>();
+            String idToken = jwtService.generateToken(email);
+            responseBody.put("accessToken", idToken);
+            responseBody.put("message", "user logged in successfully");
+            return responseBody;
+        } else {
+            throw new InvalidGoogleIdToken("Google Id Token could not be verified");
+        }
+
+    }
+
 
     @Override
     public User getUserByEmail(String email) throws UserNotFound {

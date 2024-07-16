@@ -1,10 +1,7 @@
 package org.gaminghaven.service;
 
 import org.gaminghaven.entities.User;
-import org.gaminghaven.exceptions.InvalidLoginCreds;
-import org.gaminghaven.exceptions.ProductNotFound;
-import org.gaminghaven.exceptions.PersistenceException;
-import org.gaminghaven.exceptions.UserNotFound;
+import org.gaminghaven.exceptions.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +25,13 @@ public interface UserService {
      * @throws InvalidLoginCreds
      */
     Map<String, String> loginUser(String email, String password, HttpServletResponse response, HttpServletRequest request) throws InvalidLoginCreds;
+
+    /**
+     *
+     * @param email
+     * @return
+     */
+    Map<String, String> getAccessToken(String email, String thirdPartyIdToken) throws InvalidGoogleIdToken;
 
     /**
      * @param email

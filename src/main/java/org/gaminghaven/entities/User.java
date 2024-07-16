@@ -38,6 +38,9 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column
+    private String provider;
+
     @PrePersist
     protected void onCreate() {
         updatedAt = LocalDateTime.now();
@@ -144,6 +147,14 @@ public class User {
 
     public int getUserId() {
         return userId;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     public List<Review> getReviews() {

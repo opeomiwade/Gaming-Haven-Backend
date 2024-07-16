@@ -35,7 +35,8 @@ public class SecurityConfig {
                 cors().
                 and().
                 authorizeHttpRequests((authorize) -> authorize
-                        .antMatchers("/users/login").permitAll()             // Allow access without authentication
+                        .antMatchers("/users/login").permitAll()
+                        .antMatchers("/users/access-token").permitAll()      // Allow access without authentication
                         .antMatchers("/users/signup").permitAll()             // Allow access without authentication
                         .antMatchers("/users/user/{email}").permitAll()      // Allow access without authentication
                         .antMatchers("/users/**").authenticated()        // Require authentication for all other /users/** routes

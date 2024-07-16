@@ -181,9 +181,10 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound, ImageNotFound {
+    public Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound {
         Listing listingToEdit = listingRepo.findById(listingId).
                 orElseThrow(() -> new ProductNotFound("No Listing with that Id was found"));
+
         if (listingRequest.getPrice() != null) {
             listingToEdit.setPrice(listingRequest.getPrice());
         }
@@ -197,11 +198,20 @@ public class ListingServiceImpl implements ListingService {
         }
 
         if (listingRequest.getImages() != null) {
+            List<ListingImage> prevImages = listingToEdit.getImages();
             for (ListingImage listingImage : listingRequest.getImages()) {
                 ListingImage image = listingImageRepo.findById(listingImage.getImageId()).orElse(null);
+
+                // save new images user added to listing
                 if (image == null) {
-                    System.out.println(image);
+                    ListingImage newImage = new ListingImage();
+                    newImage.setImageUrl(image.getImageUrl());
+                    listingImageRepo.save(newImage);
+                    listingToEdit.setImages(listingToEdit.getImages());
+                    prevImages.add(newImage);
                 }
+
+                //update image url if its the same image
                 image.setImageUrl(listingImage.getImageUrl());
                 listingImageRepo.save(image);
             }
