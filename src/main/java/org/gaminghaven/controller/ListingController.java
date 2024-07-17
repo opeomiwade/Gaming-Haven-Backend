@@ -2,6 +2,7 @@ package org.gaminghaven.controller;
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.ImageNotFound;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.repos.ListingRepo;
 import org.gaminghaven.repos.UserRepo;
@@ -108,7 +109,7 @@ public class ListingController {
         try {
             listingService.deleteListing(listingId);
             return new ResponseEntity("Listing deleted successfully", HttpStatus.OK);
-        } catch (ProductNotFound exception) {
+        } catch (ListingNotFoundException exception) {
             return new ResponseEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
         }
     }

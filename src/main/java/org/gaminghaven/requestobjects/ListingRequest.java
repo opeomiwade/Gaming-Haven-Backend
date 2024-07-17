@@ -22,8 +22,14 @@ public class ListingRequest {
 
     private String manufacturer;
 
+    private List<Integer> deleteImages;
+
     public BigDecimal getPrice() {
         return price;
+    }
+
+    public List<Integer> getDeleteImages() {
+        return deleteImages;
     }
 
     public String[] getImageUrls() {

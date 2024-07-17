@@ -2,6 +2,7 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.*;
 import org.gaminghaven.exceptions.ImageNotFound;
+import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.repos.*;
 import org.gaminghaven.requestobjects.ListingRequest;
@@ -181,39 +182,41 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound {
+    public Listing editListing(int listingId, ListingRequest listingRequest) throws ProductNotFound, ImageNotFound {
         Listing listingToEdit = listingRepo.findById(listingId).
                 orElseThrow(() -> new ProductNotFound("No Listing with that Id was found"));
 
-        if (listingRequest.getPrice() != null) {
+        if (listingRequest.getPrice() != null &&
+                !listingRequest.getPrice().equals(listingToEdit.getPrice())) {
             listingToEdit.setPrice(listingRequest.getPrice());
         }
 
-        if (listingRequest.getCondition() != null) {
+        if (listingRequest.getCondition() != null &&
+                !listingRequest.getCondition().equals(listingToEdit.getCondition())) {
             listingToEdit.setCondition(listingRequest.getCondition());
         }
 
-        if (listingRequest.getDescription() != null) {
+        if (listingRequest.getDescription() != null &&
+                !listingRequest.getDescription().equals(listingToEdit.getDescription())) {
             listingToEdit.setDescription(listingRequest.getDescription());
         }
 
-        if (listingRequest.getImages() != null) {
-            List<ListingImage> prevImages = listingToEdit.getImages();
-            for (ListingImage listingImage : listingRequest.getImages()) {
-                ListingImage image = listingImageRepo.findById(listingImage.getImageId()).orElse(null);
-
+        if (listingRequest.getImageUrls() != null) {
+            List<ListingImage> updatedImages = listingToEdit.getImages();
+            for (String imageUrl : listingRequest.getImageUrls()) {
                 // save new images user added to listing
-                if (image == null) {
-                    ListingImage newImage = new ListingImage();
-                    newImage.setImageUrl(image.getImageUrl());
-                    listingImageRepo.save(newImage);
-                    listingToEdit.setImages(listingToEdit.getImages());
-                    prevImages.add(newImage);
-                }
+                ListingImage newImage = new ListingImage();
+                newImage.setImageUrl(imageUrl);
+                newImage.setListing(listingToEdit);
+                listingImageRepo.save(newImage);
+                updatedImages.add(newImage);
+            }
+            listingToEdit.setImages(updatedImages);
+        }
 
-                //update image url if its the same image
-                image.setImageUrl(listingImage.getImageUrl());
-                listingImageRepo.save(image);
+        if (listingRequest.getDeleteImages() != null && listingRequest.getDeleteImages().size() > 0) {
+            for (int id : listingRequest.getDeleteImages()) {
+                deleteListingImage(id);
             }
         }
         listingToEdit.setUpdatedAt(LocalDateTime.now());
@@ -222,9 +225,15 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public void deleteListing(int listingId) throws ProductNotFound {
+    public void deleteListing(int listingId) throws ListingNotFoundException {
         Listing listingToDelete = listingRepo.findById(listingId).
-                orElseThrow(() -> new ProductNotFound("No listing with that id exists"));
+                orElseThrow(() -> new ListingNotFoundException("No listing with that id exists"));
         listingRepo.delete(listingToDelete);
+    }
+
+    private void deleteListingImage(int id) throws ImageNotFound {
+        ListingImage imageToDelete = listingImageRepo.findById(id).
+                orElseThrow(() -> new ImageNotFound("No Image with that id exists"));
+        listingImageRepo.delete(imageToDelete);
     }
 }
