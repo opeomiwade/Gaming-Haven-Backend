@@ -27,7 +27,7 @@ public class Listing {
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL)
     private List<ListingImage> images;
 
-    // list of cash offer for this listing
+    // list of cash offers for this listing
     @OneToMany(mappedBy = "listing", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Offer> offers;
@@ -39,6 +39,10 @@ public class Listing {
 
     @ManyToMany(mappedBy = "savedListings")
     private List<User> savedBy;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "requestedItem")
+    private List<Trade> trades;
 
     @Column
     private String description;
@@ -99,6 +103,14 @@ public class Listing {
 
     public String getStatus() {
         return status;
+    }
+
+    public List<Trade> getTrades() {
+        return trades;
+    }
+
+    public void setTrades(List<Trade> trades) {
+        this.trades = trades;
     }
 
     public void setStatus(String status) {

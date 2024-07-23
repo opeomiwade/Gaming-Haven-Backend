@@ -2,10 +2,10 @@ package org.gaminghaven.service;
 
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.exceptions.ImageNotFound;
-import org.gaminghaven.exceptions.InvalidGoogleIdToken;
 import org.gaminghaven.exceptions.ListingNotFoundException;
 import org.gaminghaven.exceptions.ProductNotFound;
 import org.gaminghaven.requestobjects.ListingRequest;
+import org.gaminghaven.entities.Offer;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -31,4 +31,5 @@ public interface ListingService {
 
     void deleteListing(int listingId) throws ListingNotFoundException;
 
+    List<Offer> getListingOffers(int listingId) throws ListingNotFoundException;
 }

@@ -41,12 +41,6 @@ public class User {
     @Column
     private String provider;
 
-    @PrePersist
-    protected void onCreate() {
-        updatedAt = LocalDateTime.now();
-        createdAt = LocalDateTime.now();
-    }
-
     //list of user listings
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -56,11 +50,11 @@ public class User {
     @JsonIgnore
     private List<Review> reviews;
 
-    @OneToMany(mappedBy = "user1", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Trade> initiatedTrades;
 
-    @OneToMany(mappedBy = "user2", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Trade> receivedTrades;
 
@@ -91,6 +85,12 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "product_id")})
     @JsonIgnore
     private List<Product> products;
+
+    @PrePersist
+    protected void onCreate() {
+        updatedAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
+    }
 
     public List<Listing> getSavedListings() {
         return savedListings;

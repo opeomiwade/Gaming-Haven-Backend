@@ -1,8 +1,11 @@
 package org.gaminghaven.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "trades")
@@ -13,20 +16,24 @@ public class Trade {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id_1", nullable = false)
-    private User user1;
+    @JoinColumn(name = "sender", nullable = false)
+    private User sender;
+
+    @ManyToMany
+    @JsonIgnore
+    @JoinTable(name = "trade_offered_listings",
+            joinColumns = {@JoinColumn(name = "trade_id")},
+            inverseJoinColumns = {@JoinColumn(name = "listing_id")} )
+    private List<Listing> offeredItems;
 
     @ManyToOne
-    @JoinColumn(name = "user_id_2", nullable = false)
-    private User user2;
+    @JoinColumn(name = "recipient", nullable = false)
+    private User recipient;
 
     @ManyToOne
-    @JoinColumn(name = "listing_id_1", nullable = false)
-    private Listing listing1;
-
-    @ManyToOne
-    @JoinColumn(name = "listing_id_2", nullable = false)
-    private Listing listing2;
+    @JoinColumn(name = "requested_item_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Listing requestedItem;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -44,8 +51,20 @@ public class Trade {
         return id;
     }
 
-    public Listing getListing1() {
-        return listing1;
+    public void setTradeStatus(String tradeStatus) {
+        this.tradeStatus = tradeStatus;
+    }
+
+    public String getTradeStatus() {
+        return tradeStatus;
+    }
+
+    public List<Listing> getOfferedItems() {
+        return offeredItems;
+    }
+
+    public void setOfferedItems(List<Listing> offeredItems) {
+        this.offeredItems = offeredItems;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
@@ -56,31 +75,27 @@ public class Trade {
         return createdAt;
     }
 
-    public Listing getListing2() {
-        return listing2;
+    public Listing getRequestedItem() {
+        return requestedItem;
     }
 
-    public User getUser1() {
-        return user1;
+    public User getSender() {
+        return sender;
     }
 
-    public User getUser2() {
-        return user2;
+    public User getRecipient() {
+        return recipient;
     }
 
-    public void setListing1(Listing listing1) {
-        this.listing1 = listing1;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
-    public void setUser1(User user1) {
-        this.user1 = user1;
+    public void setRequestedItem(Listing requestedItem) {
+        this.requestedItem = requestedItem;
     }
 
-    public void setListing2(Listing listing2) {
-        this.listing2 = listing2;
-    }
-
-    public void setUser2(User user2) {
-        this.user2 = user2;
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
     }
 }

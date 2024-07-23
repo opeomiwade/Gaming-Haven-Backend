@@ -1,5 +1,8 @@
 package org.gaminghaven.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,6 +25,7 @@ public class Offer {
 
     @ManyToOne
     @JoinColumn(name = "listing_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Listing listing;
 
     @Column(nullable = false)
@@ -35,7 +39,7 @@ public class Offer {
 
     @PrePersist
     protected void onCreate() {
-        status = "sent";
+        status = "pending";
         createdAt = LocalDateTime.now();
     }
 

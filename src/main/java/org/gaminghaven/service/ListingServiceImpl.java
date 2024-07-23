@@ -37,6 +37,9 @@ public class ListingServiceImpl implements ListingService {
     @Autowired
     CategoryRepo categoryRepo;
 
+    @Autowired
+    OfferRepo offerRepo;
+
 
     @Override
     @Transactional
@@ -229,6 +232,13 @@ public class ListingServiceImpl implements ListingService {
         Listing listingToDelete = listingRepo.findById(listingId).
                 orElseThrow(() -> new ListingNotFoundException("No listing with that id exists"));
         listingRepo.delete(listingToDelete);
+    }
+
+    @Override
+    public List<Offer> getListingOffers(int listingId) throws ListingNotFoundException {
+        Listing listing = listingRepo.findById(listingId).orElseThrow(() ->
+                new ListingNotFoundException("No listing with that Id was found"));
+        return listing.getOffers();
     }
 
     private void deleteListingImage(int id) throws ImageNotFound {

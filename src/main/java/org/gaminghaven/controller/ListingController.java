@@ -1,4 +1,5 @@
 package org.gaminghaven.controller;
+
 import org.gaminghaven.entities.Listing;
 import org.gaminghaven.entities.User;
 import org.gaminghaven.exceptions.ImageNotFound;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
@@ -75,6 +77,15 @@ public class ListingController {
     @GetMapping("/user/sold-listings")
     public ResponseEntity getUserSoldListings() {
         return new ResponseEntity(listingService.getUserSoldListings(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{listingId}/offers")
+    public ResponseEntity getListingOffers(@PathVariable int listingId) {
+        try {
+            return new ResponseEntity(listingService.getListingOffers(listingId), HttpStatus.OK);
+        } catch (ListingNotFoundException ex) {
+            return new ResponseEntity(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/filter")
